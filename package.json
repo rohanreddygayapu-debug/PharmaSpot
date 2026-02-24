@@ -1,0 +1,36 @@
+{
+  "name": "pharmaspot-frontend",
+  "version": "1.5.1",
+  "description": "Point of Sale Frontend for Pharmacies",
+  "author": "Patterns Digital Limited",
+  "website": "https://patternsdigital.com/pharmaspot",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "chart.js": "^4.5.1",
+    "dompurify": "^3.2.4",
+    "html2canvas": "^1.4.1",
+    "jsbarcode": "^3.11.5",
+    "jspdf": "^3.0.2",
+    "jspdf-autotable": "^5.0.2",
+    "moment": "^2.29.4",
+    "notiflix": "^3.2.5",
+    "print-js": "^1.6.0",
+    "react": "^19.2.3",
+    "react-chartjs-2": "^5.3.1",
+    "react-dom": "^19.2.3",
+    "socket.io-client": "^4.8.1",
+    "validator": "^13.15.23"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^5.1.2",
+    "jest": "^29.7.0",
+    "vite": "^7.2.7"
+  }
+}

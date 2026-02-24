@@ -1,0 +1,255 @@
+import React, { useState } from 'react'
+import { useAuth } from '../contexts/AuthContext'
+import { useTheme } from '../contexts/ThemeContext'
+import Signup from './Signup'
+import OTPVerification from './OTPVerification'
+import loginImage from '../../assets/loginui/image.png'
+import './Login.css'
+
+function Login() {
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [showSignup, setShowSignup] = useState(false)
+  const [showOTP, setShowOTP] = useState(false)
+  const [otpData, setOtpData] = useState(null)
+  const [showPassword, setShowPassword] = useState(false)
+  const [rememberMe, setRememberMe] = useState(false)
+  const { login, completeLogin } = useAuth()
+  const { theme, toggleTheme } = useTheme()
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setError('')
+    
+    if (!username || !password) {
+      setError('Please enter username and password')
+      return
+    }
+
+    setLoading(true)
+    const result = await login(username, password)
+    setLoading(false)
+
+    if (result.success) {
+      // Login successful (no OTP, direct login)
+      // Already handled by AuthContext
+    } else if (result.otpRequired) {
+      // OTP verification required
+      setOtpData({
+        userId: result.userId,
+        email: result.email
+      })
+      setShowOTP(true)
+    } else {
+      setError(result.error || 'Login failed')
+    }
+  }
+
+  const handleOTPSuccess = (userData) => {
+    // OTP verified, complete login by updating the auth context
+    completeLogin(userData)
+    setShowOTP(false)
+  }
+
+  const handleBackToLogin = () => {
+    setShowOTP(false)
+    setOtpData(null)
+    setPassword('')
+    setError('')
+  }
+
+  if (showOTP && otpData) {
+    return (
+      <OTPVerification
+        userId={otpData.userId}
+        email={otpData.email}
+        onBack={handleBackToLogin}
+        onSuccess={handleOTPSuccess}
+      />
+    )
+  }
+
+  if (showSignup) {
+    return <Signup onSwitchToLogin={() => setShowSignup(false)} />
+  }
+
+  return (
+    <div className="login-container">
+      {/* Theme Toggle Button */}
+      <button className="theme-toggle" onClick={toggleTheme} aria-label="Toggle theme">
+        <span className="material-symbols-outlined">
+          {theme === 'dark' ? 'light_mode' : 'dark_mode'}
+        </span>
+      </button>
+
+      {/* Left Column: Login Form */}
+      <div className="login-form-column">
+        {/* Header / Logo */}
+        <header className="login-logo-header">
+          <div className="logo-icon">
+            <svg className="logo-svg" fill="currentColor" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+              <path clipRule="evenodd" d="M39.475 21.6262C40.358 21.4363 40.6863 21.5589 40.7581 21.5934C40.7876 21.655 40.8547 21.857 40.8082 22.3336C40.7408 23.0255 40.4502 24.0046 39.8572 25.2301C38.6799 27.6631 36.5085 30.6631 33.5858 33.5858C30.6631 36.5085 27.6632 38.6799 25.2301 39.8572C24.0046 40.4502 23.0255 40.7407 22.3336 40.8082C21.8571 40.8547 21.6551 40.7875 21.5934 40.7581C21.5589 40.6863 21.4363 40.358 21.6262 39.475C21.8562 38.4054 22.4689 36.9657 23.5038 35.2817C24.7575 33.2417 26.5497 30.9744 28.7621 28.762C30.9744 26.5497 33.2417 24.7574 35.2817 23.5037C36.9657 22.4689 38.4054 21.8562 39.475 21.6262ZM4.41189 29.2403L18.7597 43.5881C19.8813 44.7097 21.4027 44.9179 22.7217 44.7893C24.0585 44.659 25.5148 44.1631 26.9723 43.4579C29.9052 42.0387 33.2618 39.5667 36.4142 36.4142C39.5667 33.2618 42.0387 29.9052 43.4579 26.9723C44.1631 25.5148 44.659 24.0585 44.7893 22.7217C44.9179 21.4027 44.7097 19.8813 43.5881 18.7597L29.2403 4.41187C27.8527 3.02428 25.8765 3.02573 24.2861 3.36776C22.6081 3.72863 20.7334 4.58419 18.8396 5.74801C16.4978 7.18716 13.9881 9.18353 11.5858 11.5858C9.18354 13.988 7.18717 16.4978 5.74802 18.8396C4.58421 20.7334 3.72865 22.6081 3.36778 24.2861C3.02574 25.8765 3.02429 27.8527 4.41189 29.2403Z" fillRule="evenodd"></path>
+            </svg>
+          </div>
+          <span className="logo-title">PharmaAI</span>
+        </header>
+
+        {/* Main Content Area */}
+        <main className="login-main-content">
+          {/* Page Heading */}
+          <div className="login-heading">
+            <h1 className="login-title">Welcome Back</h1>
+            <p className="login-subtitle">Please enter your details to access the inventory dashboard.</p>
+          </div>
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="login-form">
+            {error && (
+              <div className="error-message">
+                {error}
+              </div>
+            )}
+
+            {/* Email/Username Field */}
+            <label className="form-group">
+              <span className="form-label">Email or Username</span>
+              <div className="input-wrapper">
+                <span className="material-symbols-outlined input-icon">person</span>
+                <input
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="Enter your email or username"
+                  className="form-input with-left-icon"
+                  disabled={loading}
+                />
+              </div>
+            </label>
+
+            {/* Password Field */}
+            <label className="form-group">
+              <span className="form-label">Password</span>
+              <div className="input-wrapper">
+                <span className="material-symbols-outlined input-icon">lock</span>
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter your password"
+                  className="form-input with-left-icon with-right-icon"
+                  disabled={loading}
+                />
+                <button
+                  type="button"
+                  className="password-toggle"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  <span className="material-symbols-outlined">
+                    {showPassword ? 'visibility_off' : 'visibility'}
+                  </span>
+                </button>
+              </div>
+            </label>
+
+            {/* Actions Row */}
+            <div className="form-actions">
+              <label className="remember-me">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="checkbox"
+                />
+                <span className="checkbox-label">Remember me</span>
+              </label>
+              <a href="#" className="forgot-password">Forgot Password?</a>
+            </div>
+
+            {/* Submit Button */}
+            <button type="submit" className="login-button" disabled={loading}>
+              {loading ? (
+                <>
+                  <span className="spinner"></span>
+                  <span>Logging in...</span>
+                </>
+              ) : (
+                <>
+                  Log In
+                  <span className="material-symbols-outlined">arrow_forward</span>
+                </>
+              )}
+            </button>
+
+            {/* Divider */}
+            <div className="divider">
+              <div className="divider-line"></div>
+              <span className="divider-text">OR CONTINUE WITH</span>
+              <div className="divider-line"></div>
+            </div>
+
+            {/* SSO Buttons */}
+            <div className="sso-buttons">
+              <button type="button" className="sso-button">
+                <svg className="sso-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
+                  <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
+                  <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"></path>
+                  <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path>
+                </svg>
+                Google
+              </button>
+              <button type="button" className="sso-button">
+                <svg className="sso-icon" viewBox="0 0 23 23" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M0 0h23v23H0z" fill="#f3f3f3"></path>
+                  <path d="M1 1h10v10H1z" fill="#f35325"></path>
+                  <path d="M12 1h10v10H12z" fill="#81bc06"></path>
+                  <path d="M1 12h10v10H1z" fill="#05a6f0"></path>
+                  <path d="M12 12h10v10H12z" fill="#ffba08"></path>
+                </svg>
+                Microsoft
+              </button>
+            </div>
+          </form>
+        </main>
+
+        {/* Footer */}
+        <footer className="login-footer">
+          <div className="security-badge">
+            <span className="material-symbols-outlined">lock</span>
+            <p>Secure 256-bit encrypted connection</p>
+          </div>
+          <div className="footer-info">
+            <p>© 2024 PharmaAI Systems.</p>
+            <a href="#" className="support-link">Contact Support</a>
+          </div>
+          <div className="signup-prompt">
+            Don't have an account?{' '}
+            <a href="#" onClick={(e) => { e.preventDefault(); setShowSignup(true); }} className="signup-link">
+              Sign Up
+            </a>
+          </div>
+        </footer>
+      </div>
+
+      {/* Right Column: Visual / Image */}
+      <div className="login-visual-column">
+        <img src={loginImage} alt="Login UI" className="login-visual-image" />
+        <div className="visual-overlay"></div>
+        <div className="visual-content">
+          <div className="status-badge">
+            <div className="status-pulse"></div>
+            <span className="status-text">System Operational</span>
+          </div>
+          <h2 className="visual-title">Advanced Inventory Intelligence</h2>
+          <p className="visual-description">
+            Optimize pharmacy workflows with real-time AI analytics and automated stock management.
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default Login

@@ -1,0 +1,37 @@
+.footer {
+  background: white;
+  border-top: 1px solid var(--border-color);
+  margin-top: 4rem;
+}
+
+.footer-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.footer-content p {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  margin: 0.25rem 0;
+}
+
+.footer-tech {
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+/* Dark mode styles */
+.dark .footer {
+  background: black;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark .footer-content p {
+  color: white;
+}
+
+.dark .footer-tech {
+  color: white;
+}
