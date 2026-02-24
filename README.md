@@ -1069,5 +1069,3 @@ Thank you for using **PharmaSpot**! We hope this system helps streamline your ph
   <a href="https://github.com/punithsai18/Hack/issues">🐛 Report Bug</a> •
   <a href="https://github.com/punithsai18/Hack/issues">💡 Request Feature</a>
 </p>
-#   P h a r m a S p o t  
- 
